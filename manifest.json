@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
-  "name": "YouTube Video Scraper",
-  "description": "Scrape YouTube videos data and export as CSV.",
+  "name": "growth-tools-hacker-suite",
+  "description": "Best in browser chrome extension for growth hacking your brand.",
   "version": "1.0",
   "permissions": ["activeTab", "storage"],
   "background": {
@@ -10,21 +10,13 @@
   },
   "browser_action": {
     "default_popup": "popup.html",
-    "default_icon": {
-      "16": "icons/icon16.png",
-      "48": "icons/icon48.png",
-      "128": "icons/icon128.png"
-    }
+    "default_icon": "icon.png"
   },
+  "options_page": "options.html",
   "content_scripts": [
     {
       "matches": ["https://www.youtube.com/*"],
-      "js": ["content.js"]
+      "js": ["contents/youtube.js"]
     }
-  ],
-  "icons": {
-    "16": "icons/icon16.png",
-    "48": "icons/icon48.png",
-    "128": "icons/icon128.png"
-  }
+  ]
 }

@@ -1,13 +1,23 @@
 let stopScraping = false;
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  if (request.action === "startScraping") {
-    console.log("Received startScraping message, beginning scrape");
-    stopScraping = false;
-    scrapeYouTube(request.url);
-  } else if (request.action === "stopScraping") {
-    console.log("Received stopScraping message, stopping scrape");
-    stopScraping = true;
+  try {
+    if (request.action === "startScraping") {
+      console.log("Received startScraping message, beginning scrape");
+      stopScraping = false;
+      scrapeYouTube(request.url);
+    } else if (request.action === "stopScraping") {
+      console.log("Received stopScraping message, stopping scrape");
+      stopScraping = true;
+    }
+  } catch (error) {
+    console.error(error);
+    // Send scraped data to background script for storage
+    chrome.runtime.sendMessage({
+      action: "saveData",
+      key: `growth-tools-youtube-videos-${url}`,
+      data: scrapedData,
+    });
   }
 });
 
@@ -26,7 +36,7 @@ function scrapeYouTube(url) {
     setTimeout(() => {
       const newHeight = document.documentElement.scrollHeight;
       if (newHeight > lastHeight && scrolls < maxScrolls) {
-        scrapeAndSave();
+        scrapeAndSaveYoutubeVideosData();
         scrollToBottom(callback, maxScrolls, scrolls + 1);
       } else {
         callback();
@@ -34,25 +44,28 @@ function scrapeYouTube(url) {
     }, 5000); // Increased timeout
   }
 
-  function scrapeAndSave() {
+  function scrapeAndSaveYoutubeVideosData() {
     if (stopScraping) return; // Stop scraping if the flag is set
 
-    const newData = scrapeData();
+    const newData = scrapeYoutubeVideosData();
     scrapedData = scrapedData.concat(newData);
     console.log(`Scraping data, total scraped: ${scrapedData.length}`);
 
     // Send scraped data to background script for storage
     chrome.runtime.sendMessage({
       action: "saveData",
-      key: `scalesleek-youtube-videos-${url}`,
+      key: `growth-tools-youtube-videos-${url}`,
       data: scrapedData,
     });
 
     // Send message to update progress in popup
-    chrome.runtime.sendMessage({ action: "updateProgress", count: scrapedData.length });
+    chrome.runtime.sendMessage({
+      action: "updateProgress",
+      count: scrapedData.length,
+    });
   }
 
-  function scrapeData() {
+  function scrapeYoutubeVideosData() {
     const videos = document.querySelectorAll("#dismissible");
     const data = [];
 
@@ -63,11 +76,21 @@ function scrapeYouTube(url) {
       const linkElement = video.querySelector("a.yt-simple-endpoint");
 
       const title = titleElement ? titleElement.innerText.trim() : "N/A";
-      const impressions = impressionsElement ? impressionsElement.innerText.trim() : "N/A";
+      const impressions = impressionsElement
+        ? impressionsElement.innerText.trim()
+        : "N/A";
       const image = imageElement ? imageElement.src : "N/A";
-      const link = linkElement ? "https://youtube.com" + linkElement.getAttribute("href") : "N/A";
+      const link = linkElement
+        ? "https://youtube.com" + linkElement.getAttribute("href")
+        : "N/A";
 
-      data.push({ title, impressions, image, link });
+      data.push({
+        title,
+        impressions,
+        image,
+        link,
+        lastScraped: new Date().toISOString(),
+      });
     });
 
     return data;
