@@ -11,6 +11,14 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
+    // Add event listener to the filter checkbox
+    const imageFilter = document.getElementById("imageFilter");
+    imageFilter.addEventListener("change", function () {
+        if (currentUrlKey) {
+            loadDataIntoList(currentUrlKey);
+        }
+    });
+
     if (currentUrlKey) {
         loadDataIntoList(currentUrlKey);
     }
@@ -63,7 +71,14 @@ function loadDataIntoList(urlKey) {
 
             // Create the body of the table
             const tbody = document.createElement("tbody");
+
+            // Filter logic
+            const filterImages = document.getElementById("imageFilter").checked;
             result[key].forEach(item => {
+                if (filterImages && !item.image) {
+                    return; // Skip items without images if filter is active
+                }
+
                 const tr = document.createElement("tr");
 
                 // Title
@@ -78,7 +93,10 @@ function loadDataIntoList(urlKey) {
 
                 // Image
                 const tdImage = document.createElement("td");
-                tdImage.textContent = item.image;
+                const img = document.createElement("img");
+                img.src = item.image;
+                img.alt = item.title;
+                tdImage.appendChild(img);
                 tr.appendChild(tdImage);
 
                 // Link
