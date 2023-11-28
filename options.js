@@ -53,17 +53,25 @@ function populateURLSelector(currentUrlKey) {
 
 function parseImpressions(impressions) {
     let multiplier = 1;
-    if (impressions.includes("B"))
+    let numericalPart = 0;
+
+    if (impressions.includes("B")) {
         multiplier = 1000000000;
-    else if (impressions.includes("M"))
+    } else if (impressions.includes("M")) {
         multiplier = 1000000;
-    else if (impressions.includes("K"))
+    } else if (impressions.includes("K")) {
         multiplier = 1000;
+    }
 
+    // Extracting the numerical part, considering decimal points
+    const matches = impressions.match(/(\d+(\.\d+)?)/);
+    if (matches) {
+        numericalPart = parseFloat(matches[0]);
+    }
 
-    const numericalPart = parseFloat(impressions);
     return numericalPart * multiplier;
 }
+
 
 
 function sortData(urlKey, ascending) {
@@ -80,7 +88,6 @@ function sortData(urlKey, ascending) {
     });
 }
 
-
 function displayData(data) {
     const dataListDiv = document.getElementById("youtube-data-explorer");
     dataListDiv.innerHTML = ""; // Clear previous content
@@ -91,6 +98,21 @@ function displayData(data) {
 
     const thead = document.createElement("thead");
     const headerRow = document.createElement("tr");
+
+    // Add a header for the toggle all checkbox
+    const thToggleAll = document.createElement("th");
+    const toggleAllCheckbox = document.createElement("input");
+    toggleAllCheckbox.type = "checkbox";
+    toggleAllCheckbox.id = "toggleAll";
+    toggleAllCheckbox.addEventListener("change", function () {
+        const allCheckboxes = document.querySelectorAll('.rowCheckbox');
+        allCheckboxes.forEach(checkbox => {
+            checkbox.checked = toggleAllCheckbox.checked;
+        });
+    });
+    thToggleAll.appendChild(toggleAllCheckbox);
+    headerRow.appendChild(thToggleAll);
+
     ["Title", "Impressions", "Image", "Link"].forEach((headerText, index) => {
         const th = document.createElement("th");
         th.textContent = headerText;
@@ -118,6 +140,15 @@ function displayData(data) {
         }
 
         const tr = document.createElement("tr");
+        tr.classList.add("fade-in"); // Apply fade-in class for animation
+
+        // Checkbox for each row
+        const tdCheckbox = document.createElement("td");
+        const rowCheckbox = document.createElement("input");
+        rowCheckbox.type = "checkbox";
+        rowCheckbox.classList.add("rowCheckbox");
+        tdCheckbox.appendChild(rowCheckbox);
+        tr.appendChild(tdCheckbox);
 
         // Title
         const tdTitle = document.createElement("td");
@@ -176,18 +207,39 @@ function loadDataIntoList(urlKey) {
     const key = `growth-tools-youtube-videos-${urlKey}`;
     chrome.storage.local.get([key], function (result) {
         if (result[key]) {
+            const originalDataLength = result[key].length;
+            const uniqueData = removeDuplicates(result[key]);
+
+            if (uniqueData.length < originalDataLength) {
+                // Update storage if duplicates were removed
+                chrome.storage.local.set({ [key]: uniqueData }, function () {
+                    console.log(`Duplicates removed, updated data for ${key}.`);
+                });
+            }
+
             // Sort the data by impressions
-            result[key].sort((a, b) => parseImpressions(b.impressions) - parseImpressions(a.impressions));
+            uniqueData.sort((a, b) => parseImpressions(b.impressions) - parseImpressions(a.impressions));
 
             // Filter logic for greater than or equal to impressions
             const minImpressions = document.getElementById("viewFilter").value;
             const parsedMinImpressions = minImpressions ? parseImpressions(minImpressions + 'K') : 0;
 
-            const filteredData = result[key].filter(item => parseImpressions(item.impressions) >= parsedMinImpressions);
+            const filteredData = uniqueData.filter(item => parseImpressions(item.impressions) >= parsedMinImpressions);
             displayData(filteredData);
         }
     });
 }
+
+function removeDuplicates(data) {
+    const uniqueByLink = new Map();
+    data.forEach(item => {
+        if (!uniqueByLink.has(item.link)) {
+            uniqueByLink.set(item.link, item);
+        }
+    });
+    return Array.from(uniqueByLink.values());
+}
+
 
 // Debounce function
 function debounce(func, wait, immediate) {

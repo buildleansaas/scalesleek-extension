@@ -15,7 +15,8 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         updateData(key, request.newData);
       } else {
         // Add new data
-        chrome.storage.local.set({ [key]: [request.newData] }, function () {
+        const uniqueNewData = removeDuplicates([request.newData]);
+        chrome.storage.local.set({ [key]: uniqueNewData }, function () {
           console.log(`New data for ${request.url} added.`);
         });
       }
@@ -23,7 +24,6 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   }
 });
 
-// Update Existing Data
 function updateData(key, newData) {
   chrome.storage.local.get([key], function (result) {
     if (result[key]) {
@@ -32,18 +32,22 @@ function updateData(key, newData) {
       newData.forEach((newItem) => {
         const existingItemIndex = existingData.findIndex((ed) => ed.link === newItem.link);
         if (existingItemIndex !== -1) {
-          // Update existing item
           existingData[existingItemIndex] = newItem;
         } else {
-          // Add new item
           existingData.push(newItem);
         }
       });
 
-      // Save the updated data
-      chrome.storage.local.set({ [key]: existingData }, function () {
+      const uniqueData = removeDuplicates(existingData);
+
+      chrome.storage.local.set({ [key]: uniqueData }, function () {
         console.log(`Data for ${key} updated.`);
       });
     }
   });
+}
+
+function removeDuplicates(data) {
+  const uniqueByLink = new Map(data.map(item => [item.link, item]));
+  return Array.from(uniqueByLink.values());
 }

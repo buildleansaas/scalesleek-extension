@@ -3,22 +3,24 @@
 
 <head>
     <title>Options - Growth Tools Hacker Suite</title>
-    <!-- Add your CSS links here -->
+    <link rel="stylesheet" href="styles.css" />
 </head>
 
 <body>
-    <div id="youtube-data-selector">
-        <select id="urlSelector"></select>
-        <div id="image-filter-bar">
+    <div id="youtube-data-selector" style="display: flex; align-items: center;">
+        <div style="margin:8px;">
+            <select id="urlSelector"></select>
+        </div>
+        <div id="image-filter-bar" style="margin:8px;">
             <label>
                 <input type="checkbox" id="imageFilter"> has images
             </label>
         </div>
-        <div id="views-filter-bar">
-            <label>
-                greater than # thousands of views:
-            </label>
-            <input type="number" id="viewFilter"> <!-- Corrected ID -->
+        <div id="views-filter-bar" style="display:flex; align-items: center; margin:8px;">
+            <span>
+                more than
+            </span>
+            <input type="number" id="viewFilter" style="margin:4px;"><span>(thousands) views</span>
         </div>
     </div>
     <div>

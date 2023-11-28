@@ -1,10 +1,12 @@
 let stopScraping = false;
+let scrapedUrls = new Set(); // Set to keep track of scraped video URLs
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   try {
     if (request.action === "startScraping") {
       console.log("Received startScraping message, beginning scrape");
       stopScraping = false;
+      scrapedUrls.clear(); // Clear previously scraped URLs
       scrapeYouTube(request.url);
     } else if (request.action === "stopScraping") {
       console.log("Received stopScraping message, stopping scrape");
@@ -15,11 +17,12 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     // Send scraped data to background script for storage
     chrome.runtime.sendMessage({
       action: "saveData",
-      key: `growth-tools-youtube-videos-${url}`,
-      data: scrapedData,
+      key: `growth-tools-youtube-videos-${request.url}`, // Modified to use request.url
+      data: Array.from(scrapedUrls),
     });
   }
 });
+
 
 function scrapeYouTube(url) {
   console.log("Scraping YouTube videos from", url)
@@ -45,12 +48,17 @@ function scrapeYouTube(url) {
   }
 
   function scrapeAndSaveYoutubeVideosData() {
-    console.log('scrape activated')
+    console.log('Scrape activated');
     if (stopScraping) return; // Stop scraping if the flag is set
 
     const newData = scrapeYoutubeVideosData();
-    scrapedData = scrapedData.concat(newData);
-    console.log(`Scraping data, total scraped: ${scrapedData.length}`);
+    newData.forEach(item => {
+      if (!scrapedUrls.has(item.link)) {
+        scrapedData.push(item);
+        scrapedUrls.add(item.link); // Add the URL to the set of scraped URLs
+      }
+    });
+    console.log(`Scraping data, total unique scraped: ${scrapedData.length}`);
 
     // Send scraped data to background script for storage
     chrome.runtime.sendMessage({
