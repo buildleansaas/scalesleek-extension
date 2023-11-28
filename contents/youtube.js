@@ -22,10 +22,12 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 });
 
 function scrapeYouTube(url) {
+  console.log("Scraping YouTube videos from", url)
   let scrapedData = [];
 
   function scrollToBottom(callback, maxScrolls = 100, scrolls = 0) {
     if (stopScraping) {
+      console.log("scraping stopped")
       callback(); // If scraping is stopped, invoke callback immediately
       return;
     }
@@ -38,13 +40,12 @@ function scrapeYouTube(url) {
       if (newHeight > lastHeight && scrolls < maxScrolls) {
         scrapeAndSaveYoutubeVideosData();
         scrollToBottom(callback, maxScrolls, scrolls + 1);
-      } else {
-        callback();
-      }
+      } else scrapeAndSaveYoutubeVideosData()
     }, 5000); // Increased timeout
   }
 
   function scrapeAndSaveYoutubeVideosData() {
+    console.log('scrape activated')
     if (stopScraping) return; // Stop scraping if the flag is set
 
     const newData = scrapeYoutubeVideosData();

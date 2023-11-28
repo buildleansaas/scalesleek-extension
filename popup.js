@@ -16,13 +16,12 @@
 // CHROME BACKGROUND CONNECTIONS
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  console.log(request)
   if (request.action === "updateProgress") {
     document.getElementById("progress").textContent = `Scraped ${request.count} videos.`;
-    document.getElementById("downloadBtn").style.display = "block"; // Show download button
-    loadScrapedDataList(); // Reload data list
-  } else if (request.action === "showDownload") {
-    document.getElementById("downloadBtn").style.display = "block"; // Ensure download button is visible
   }
+
+  loadScrapedDataList(); // Reload data list
 });
 
 // POPUP.HTML EVENT LISTENERS
@@ -59,7 +58,7 @@ document.getElementById("stopBtn").addEventListener("click", function () {
 document.addEventListener("DOMContentLoaded", function () {
   checkForYouTubeUrl(function (isYouTubeUrl) {
     const youtubeScraperSection = document.getElementById("youtube-scraper");
-    
+
 
     if (isYouTubeUrl) {
       // Show the 'youtube-scraper' section if it's a YouTube URL
@@ -103,7 +102,7 @@ function createDataRow(url, count) {
     // Open the options page with the URL parameter
     const optionsUrl = `options.html?url=${encodeURIComponent(url)}`;
     chrome.tabs.create({ url: optionsUrl });
-});
+  });
   tdUrl.appendChild(aUrl);
 
   const tdCount = document.createElement("td");
