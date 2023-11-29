@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Options - Growth Tools Hacker Suite</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+    <div style="display: flex; justify-content: flex-start; margin-bottom: 20px;">
+        <button style="margin-right:4px;" id="youtubeTab">YouTube</button>
+        <button id="vidiqTab">VidIQ</button>
+    </div>
+
+    <div id="youtube-view">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div id="youtube-data-selector" style="display: flex; align-items: center;">
+                <div style="margin:8px;">
+                    <select id="urlSelector"></select>
+                </div>
+                <div id="image-filter-bar" style="margin:8px;">
+                    <label>
+                        <input type="checkbox" id="imageFilter"> has images
+                    </label>
+                </div>
+                <div id="views-filter-bar" style="display:flex; align-items: center; margin:8px;">
+                    <span>
+                        more than
+                    </span>
+                    <input type="number" id="viewFilter" style="margin:4px;"><span>(thousands) views</span>
+                </div>
+            </div>
+            <div id="youtube-data-actions"></div>
+
+        </div>
+        <div>
+            <h1>Youtube Data Explorer</h1>
+            <div id="youtube-data-explorer"></div>
+        </div>
+    </div>
+
+    <div id="vidiq-view"></div>
+
+    <script src="./options.js"></script>
+    <script src="./youtube-movies.js"></script>
+</body>
+
+</html>

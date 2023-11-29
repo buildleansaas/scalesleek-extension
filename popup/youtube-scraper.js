@@ -29,20 +29,6 @@ document.getElementById("stopBtn").addEventListener("click", function () {
   });
 });
 
-// Load all scraped data into lists.
-document.addEventListener("DOMContentLoaded", function () {
-  checkForYouTubeUrl(function (isYouTubeUrl) {
-    const youtubeScraperSection = document.getElementById("youtube-videos-scraper");
-    if (isYouTubeUrl) {
-      // TODO: check url for /watch or /videos.
-      youtubeScraperSection.style.display = "block";
-      loadScrapedDataList();
-    } else {
-      youtubeScraperSection.style.display = "none";
-    }
-  });
-});
-
 // DISPLAY FUNCTIONS
 
 // Load all scraped data into lists.
@@ -70,8 +56,7 @@ function createDataRow(url, count) {
   aUrl.textContent = url.replaceAll("https://www.youtube.com/", "");
   aUrl.addEventListener("click", function (event) {
     event.preventDefault();
-    // Open the options page with the URL parameter
-    const optionsUrl = `options.html?url=${encodeURIComponent(url)}`;
+    const optionsUrl = `options.html?type=${encodeURIComponent("youtube")}&url=${encodeURIComponent(url)}`;
     chrome.tabs.create({ url: optionsUrl });
   });
   tdUrl.appendChild(aUrl);
@@ -160,14 +145,5 @@ function navigateToVideo(url) {
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     const activeTab = tabs[0];
     chrome.tabs.update(activeTab.id, { url });
-  });
-}
-
-// TODO: refactor to check for YouTube URL for variations (e.g. /watch, /videos, etc.)
-function checkForYouTubeUrl(callback) {
-  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-    const activeTab = tabs[0];
-    if (activeTab.url && activeTab.url.includes("youtube.com")) callback(true, activeTab.url);
-    else callback(false);
   });
 }

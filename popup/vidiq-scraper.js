@@ -11,29 +11,6 @@ document.getElementById("scrapeVidIQBtn").addEventListener("click", function () 
     });
 });
 
-// Load all scraped data into lists.
-document.addEventListener("DOMContentLoaded", function () {
-    checkForVidIQUrl(function (isVidIQUrl) {
-        const vidiqScraperSection = document.getElementById("vidiq-keyword-scraper");
-        if (isVidIQUrl) {
-            vidiqScraperSection.style.display = "block";
-            loadVidIQDataList();
-        } else {
-            vidiqScraperSection.style.display = "none";
-        }
-    });
-});
-
-// DISPLAY FUNCTIONS
-
-function checkForVidIQUrl(callback) {
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-        const activeTab = tabs[0];
-        if (activeTab.url && activeTab.url.includes("vidiq.com")) callback(true, activeTab.url);
-        else callback(false);
-    });
-}
-
 function loadVidIQDataList() {
     chrome.storage.local.get(null, function (items) {
         console.log("Loaded items:", items)
@@ -50,7 +27,6 @@ function loadVidIQDataList() {
     });
 }
 
-
 function createVidIQDataRow(channel, count) {
     const tr = document.createElement("tr");
 
@@ -60,7 +36,7 @@ function createVidIQDataRow(channel, count) {
     aChannel.textContent = channel;
     aChannel.addEventListener("click", function (event) {
         event.preventDefault();
-        const optionsUrl = `options.html?channel=${encodeURIComponent(channel)}`;
+        const optionsUrl = `options.html?type=${encodeURIComponent("youtube")}&channel=${encodeURIComponent(channel)}`;
         chrome.tabs.create({ url: optionsUrl });
     });
     tdChannel.appendChild(aChannel);

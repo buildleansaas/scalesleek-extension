@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", function () {
     urlSelector.addEventListener("change", function () {
         const selectedURL = urlSelector.value;
         if (selectedURL) {
-            window.location.search = `?url=${encodeURIComponent(selectedURL)}`;
+            window.location.search = `?type=youtube&url=${encodeURIComponent(selectedURL)}`;
         }
     });
 
@@ -88,19 +88,13 @@ function parseImpressions(impressions) {
     let multiplier = 1;
     let numericalPart = 0;
 
-    if (impressions.includes("B")) {
-        multiplier = 1000000000;
-    } else if (impressions.includes("M")) {
-        multiplier = 1000000;
-    } else if (impressions.includes("K")) {
-        multiplier = 1000;
-    }
+    if (impressions.includes("B")) multiplier = 1000000000;
+    else if (impressions.includes("M")) multiplier = 1000000;
+    else if (impressions.includes("K")) multiplier = 1000;
 
     // Extracting the numerical part, considering decimal points
     const matches = impressions.match(/(\d+(\.\d+)?)/);
-    if (matches) {
-        numericalPart = parseFloat(matches[0]);
-    }
+    if (matches) numericalPart = parseFloat(matches[0]);
 
     return numericalPart * multiplier;
 }
