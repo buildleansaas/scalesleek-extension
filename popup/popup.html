@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Growth Tools Hacker Suite</title>
+</head>
+<link rel="stylesheet" href="../styles.css" />
+
+<body style="min-width: 400px;">
+  <div class="header">
+    <div style="display: flex; align-items: center;">
+      <img src="../icon.png" style="padding-right: 2px;" />
+      <h1>Growth Tools Hacker Suite</h1>
+    </div>
+    <!-- TODO: add options view -->
+  </div>
+
+  <div id="youtube-videos-scraper"> <!-- used for scraping pages like youtube.com/@channel/videos -->
+    <h2 style="margin-bottom: 0">Youtube Scraper</h2>
+    <h3>How to use</h3>
+    <p style="margin: 0; margin-bottom: 4px">
+      Visit any youtube page and hit Scrape YT, then wait patiently as the utility scrapes all the urls on the page.
+    </p>
+    <p class="error" style="margin: 0; margin-bottom: 4px">
+      NOTE: Keep this popup & tab open while scraping or you will lose your data!
+    </p>
+    <div style="display:flex; align-items: center;">
+      <button id="scrapeBtn" style="margin-right: 4px;">Scrape YT</button>
+      <button id="stopBtn" style="display: none">Stop Scraping</button>
+    </div>
+    <p id="progress"></p>
+    <h3>Scraped Youtube Links</h3>
+    <div id="scrapedDataList" style="margin-top: 4px;">
+      <table id="YTVideosListTable">
+        <thead>
+          <tr>
+            <th>URL</th>
+            <th>Videos</th>
+            <th>Download</th>
+            <th>Delete</th>
+          </tr>
+        </thead>
+        <tbody id="YTVideosList"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="vidiq-keyword-scraper">
+    <h2 style="margin-bottom: 0">VidIQ Keyword Scraper</h2>
+    <p>You must have a VidIQ Pro Plan or better to use this feature. <a href="https://vidiq.com/buildleansaas"
+        target="_blank">Sign up here</a>,
+      then head to Keywords, then search any keyword for your niche. Then go to Related Keywords, and hit the Scrape
+      Related Keywords button.</p>
+    <div style="display:flex; align-items: center;">
+      <button id="scrapeVidIQBtn" style="margin-right: 4px;">Scrape Related Keywords</button>
+      <button id="stopVidIQBtn" style="display: none">Stop Scraping</button>
+    </div>
+    <h3>Scraped VidIQ Keywords</h3>
+    <div id="vidiqDataList">
+      <table id="VidIQKeywordsListTable">
+        <thead>
+          <tr>
+            <th>Channel</th>
+            <th>Keywords Count</th>
+            <th>Download</th>
+            <th>Delete</th>
+          </tr>
+        </thead>
+        <tbody id="VidIQKeywordsList"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="./vidiq-scraper.js"></script>
+  <script src="./youtube-scraper.js"></script>
+</body>
+
+</html>

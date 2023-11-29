@@ -1,39 +1,14 @@
-// FILE CONTENTS:
-// - Chrome background connections
-//    - chrome.runtime.onMessage.addListener (updateProgress, showDownload)
-// - Popup.html event listeners
-//    - Start scraping
-//    - Stop scraping
-//    - Download CSV
-// - Display functions
-//    - Load all scraped data into lists
-//    - Create a row for the data list
-// - CSV functions
-//    - Download CSV
-//    - Convert scraped data to CSV
-//    - Export CSV
-
-// CHROME BACKGROUND CONNECTIONS
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  console.log(request)
   if (request.action === "updateProgress") {
     document.getElementById("progress").textContent = `Scraped ${request.count} videos.`;
+    loadScrapedDataList(); // Reload data list
   }
 
-  loadScrapedDataList(); // Reload data list
+  if (request.action === "researchKeywords") {
+    handleResearchKeywords(request.videos);
+  }
 });
-
-// POPUP.HTML EVENT LISTENERS
-
-// Display mechanism
-function checkForYouTubeUrl(callback) {
-  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-    const activeTab = tabs[0];
-    if (activeTab.url && activeTab.url.includes("youtube.com")) callback(true);
-    else callback(false);
-  });
-}
 
 // Start scraping
 document.getElementById("scrapeBtn").addEventListener("click", function () {
@@ -57,19 +32,15 @@ document.getElementById("stopBtn").addEventListener("click", function () {
 // Load all scraped data into lists.
 document.addEventListener("DOMContentLoaded", function () {
   checkForYouTubeUrl(function (isYouTubeUrl) {
-    const youtubeScraperSection = document.getElementById("youtube-scraper");
-
-
+    const youtubeScraperSection = document.getElementById("youtube-videos-scraper");
     if (isYouTubeUrl) {
-      // Show the 'youtube-scraper' section if it's a YouTube URL
+      // TODO: check url for /watch or /videos.
       youtubeScraperSection.style.display = "block";
       loadScrapedDataList();
     } else {
-      // Hide the 'youtube-scraper' section if it's not a YouTube URL
       youtubeScraperSection.style.display = "none";
     }
   });
-  loadScrapedDataList();
 });
 
 // DISPLAY FUNCTIONS
@@ -77,14 +48,14 @@ document.addEventListener("DOMContentLoaded", function () {
 // Load all scraped data into lists.
 function loadScrapedDataList() {
   chrome.storage.local.get(null, function (items) {
-    const dataList = document.getElementById("dataList");
-    dataList.innerHTML = ""; // Clear existing list
+    const YTVideosList = document.getElementById("YTVideosList");
+    YTVideosList.innerHTML = ""; // Clear existing list
 
     for (let key in items) {
       if (key.startsWith("growth-tools-youtube-videos-")) {
         const url = key.replace("growth-tools-youtube-videos-", "");
         const count = items[key].length;
-        dataList.appendChild(createDataRow(url, count));
+        YTVideosList.appendChild(createDataRow(url, count));
       }
     }
   });
@@ -174,5 +145,29 @@ function deleteData(urlKey) {
   chrome.storage.local.remove(key, function () {
     console.log(`Data for ${urlKey} deleted`);
     loadScrapedDataList(); // Refresh the list to reflect the deletion
+  });
+}
+
+function createProcessButton() {
+  const button = document.createElement("button");
+  button.id = "processButton";
+  button.textContent = "Process Selected Videos";
+  document.body.appendChild(button); // Assuming you want to add it to the body
+  return button;
+}
+
+function navigateToVideo(url) {
+  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+    const activeTab = tabs[0];
+    chrome.tabs.update(activeTab.id, { url });
+  });
+}
+
+// TODO: refactor to check for YouTube URL for variations (e.g. /watch, /videos, etc.)
+function checkForYouTubeUrl(callback) {
+  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+    const activeTab = tabs[0];
+    if (activeTab.url && activeTab.url.includes("youtube.com")) callback(true, activeTab.url);
+    else callback(false);
   });
 }

@@ -16,7 +16,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     console.error(error);
     // Send scraped data to background script for storage
     chrome.runtime.sendMessage({
-      action: "saveData",
+      action: "saveYoutubeData",
       key: `growth-tools-youtube-videos-${request.url}`, // Modified to use request.url
       data: Array.from(scrapedUrls),
     });
@@ -58,11 +58,11 @@ function scrapeYouTube(url) {
         scrapedUrls.add(item.link); // Add the URL to the set of scraped URLs
       }
     });
+
     console.log(`Scraping data, total unique scraped: ${scrapedData.length}`);
 
-    // Send scraped data to background script for storage
     chrome.runtime.sendMessage({
-      action: "saveData",
+      action: "saveYoutubeData",
       key: `growth-tools-youtube-videos-${url}`,
       data: scrapedData,
     });

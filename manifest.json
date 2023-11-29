@@ -3,20 +3,38 @@
   "name": "growth-tools-hacker-suite",
   "description": "Best in browser chrome extension for growth hacking your brand.",
   "version": "1.0",
-  "permissions": ["activeTab", "storage"],
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
   "background": {
-    "scripts": ["background.js"],
-    "persistent": false
+    "scripts": [
+      "background/youtube.js",
+      "background/vidiq.js"
+    ],
+    "persistent": true
   },
   "browser_action": {
-    "default_popup": "popup.html",
+    "default_popup": "popup/popup.html",
     "default_icon": "icon.png"
   },
   "options_page": "options.html",
   "content_scripts": [
     {
-      "matches": ["https://www.youtube.com/*"],
-      "js": ["contents/youtube.js"]
+      "matches": [
+        "https://www.youtube.com/*"
+      ],
+      "js": [
+        "contents/youtube.js"
+      ]
+    },
+    {
+      "matches": [
+        "https://app.vidiq.com/*"
+      ],
+      "js": [
+        "contents/vidiq.js"
+      ]
     }
   ]
 }

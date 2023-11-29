@@ -7,21 +7,24 @@
 </head>
 
 <body>
-    <div id="youtube-data-selector" style="display: flex; align-items: center;">
-        <div style="margin:8px;">
-            <select id="urlSelector"></select>
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+        <div id="youtube-data-selector" style="display: flex; align-items: center;">
+            <div style="margin:8px;">
+                <select id="urlSelector"></select>
+            </div>
+            <div id="image-filter-bar" style="margin:8px;">
+                <label>
+                    <input type="checkbox" id="imageFilter"> has images
+                </label>
+            </div>
+            <div id="views-filter-bar" style="display:flex; align-items: center; margin:8px;">
+                <span>
+                    more than
+                </span>
+                <input type="number" id="viewFilter" style="margin:4px;"><span>(thousands) views</span>
+            </div>
         </div>
-        <div id="image-filter-bar" style="margin:8px;">
-            <label>
-                <input type="checkbox" id="imageFilter"> has images
-            </label>
-        </div>
-        <div id="views-filter-bar" style="display:flex; align-items: center; margin:8px;">
-            <span>
-                more than
-            </span>
-            <input type="number" id="viewFilter" style="margin:4px;"><span>(thousands) views</span>
-        </div>
+        <div id="youtube-data-actions"></div>
     </div>
     <div>
         <h1>Youtube Data Explorer</h1>

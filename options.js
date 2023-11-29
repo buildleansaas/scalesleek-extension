@@ -3,6 +3,21 @@ document.addEventListener("DOMContentLoaded", function () {
     const currentUrlKey = params.get('url');
     populateURLSelector(currentUrlKey);
 
+    const research = document.createElement("button");
+    research.textContent = "Research Keywords";
+    research.addEventListener("click", function () {
+        const selectedCheckboxes = document.querySelectorAll('.rowCheckbox:checked');
+        const selectedVideos = Array.from(selectedCheckboxes).map(checkbox => checkbox.dataset.videoId);
+
+        // Send the selected videos to the popup
+        if (selectedVideos.length > 0) {
+            chrome.runtime.sendMessage({ action: "researchKeywords", videos: selectedVideos });
+        }
+    });
+
+    const buttonContainer = document.getElementById("youtube-data-actions");
+    buttonContainer.appendChild(research);
+
     const urlSelector = document.getElementById("urlSelector");
     urlSelector.addEventListener("change", function () {
         const selectedURL = urlSelector.value;
@@ -29,6 +44,24 @@ document.addEventListener("DOMContentLoaded", function () {
     if (currentUrlKey) {
         loadDataIntoList(currentUrlKey);
     }
+});
+
+function updateResearchButtonState() {
+    const selectedCheckboxes = document.querySelectorAll('.rowCheckbox:checked');
+    const researchButton = document.getElementById("researchButton"); // make sure to assign this id to your button
+    researchButton.disabled = selectedCheckboxes.length === 0;
+}
+
+// Call this function whenever a checkbox state changes
+document.addEventListener("change", function (event) {
+    if (event.target.classList.contains("rowCheckbox")) {
+        updateResearchButtonState();
+    }
+});
+
+// Initial state update
+document.addEventListener("DOMContentLoaded", function () {
+    updateResearchButtonState();
 });
 
 function populateURLSelector(currentUrlKey) {
@@ -89,8 +122,8 @@ function sortData(urlKey, ascending) {
 }
 
 function displayData(data) {
-    const dataListDiv = document.getElementById("youtube-data-explorer");
-    dataListDiv.innerHTML = ""; // Clear previous content
+    const YTVideosListDiv = document.getElementById("youtube-data-explorer");
+    YTVideosListDiv.innerHTML = ""; // Clear previous content
 
     const table = document.createElement("table");
     table.style.width = '100%';
@@ -147,6 +180,7 @@ function displayData(data) {
         const rowCheckbox = document.createElement("input");
         rowCheckbox.type = "checkbox";
         rowCheckbox.classList.add("rowCheckbox");
+        rowCheckbox.dataset.videoId = item.link;
         tdCheckbox.appendChild(rowCheckbox);
         tr.appendChild(tdCheckbox);
 
@@ -186,7 +220,7 @@ function displayData(data) {
     });
     table.appendChild(tbody);
 
-    dataListDiv.appendChild(table);
+    YTVideosListDiv.appendChild(table);
 }
 
 function createSortButton(text, ascending) {
